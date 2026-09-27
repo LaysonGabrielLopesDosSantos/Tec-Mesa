@@ -1,0 +1,229 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Asset/Theme/Main.tres" type="Theme" id=1]
+[ext_resource path="res://Asset/ButtonConfig.gd" type="Script" id=2]
+
+[sub_resource type="GDScript" id=2]
+resource_name = "Main"
+script/source = "extends Node2D
+
+onready var MainMenu = $Main
+onready var Percent = $Percent
+
+func _ready():
+	MainMenu.visible = true
+	Percent.visible = false
+
+func _click_percent():
+	MainMenu.visible = false
+	Percent.visible = true
+"
+
+[sub_resource type="GDScript" id=1]
+resource_name = "Percent"
+script/source = "extends Node2D
+
+onready var AttributeInput = $\"Attribute Value\"
+onready var PercentInput = $\"Percent Value\"
+onready var ValueText = $\"Text Value\"
+onready var ValueD20Text = $\"Text d20 Value\"
+onready var TextD20 = $\"Text d20\"
+
+var Attribute = 0
+var Percent = 0
+var Value = 0
+var D20 = 0
+var ValueD20 = 0
+
+func _ready():
+	randomize()
+
+# warning-ignore:unused_argument
+func _process(delta):
+	Attribute = int(AttributeInput.text)
+	Percent = int(PercentInput.text)
+	Value = floor(Attribute * (Percent / 100.0))
+	
+	ValueText.text = \"Valor final: \" + str(Value)
+	
+	if AttributeInput.has_focus():
+		if Main._kjp(\"Enter\") or Main._kjp(\"Down\"):
+			PercentInput.grab_focus()
+			PercentInput.caret_position = PercentInput.text.length()
+	elif PercentInput.has_focus() and Main._kjp(\"Up\"):
+		AttributeInput.grab_focus()
+		AttributeInput.caret_position = AttributeInput.text.length()
+
+func _click():
+	D20 = randi() % 20 + 1
+	
+	#Verificação de crítico
+	if D20 == 20:
+		Value += Attribute * 0.5
+		TextD20.text = \"Valor do d20: \" + str(D20) + \" [CRÍTICO!]\"
+	else:
+		TextD20.text = \"Valor do d20: \" + str(D20)
+	
+	ValueD20 = Value + D20
+	ValueD20Text.text = \"Valor final com d20: \" + str(ValueD20)
+"
+
+[node name="Menu" type="Node2D"]
+script = SubResource( 2 )
+
+[node name="Main" type="Node2D" parent="."]
+visible = false
+
+[node name="Button d20" type="Button" parent="Main"]
+margin_left = 50.0
+margin_top = 50.0
+margin_right = 122.0
+margin_bottom = 70.0
+theme = ExtResource( 1 )
+text = "Rolar d20"
+flat = true
+script = ExtResource( 2 )
+
+[node name="Button Percent" type="Button" parent="Main"]
+margin_left = 50.0
+margin_top = 100.0
+margin_right = 200.0
+margin_bottom = 120.0
+theme = ExtResource( 1 )
+text = "Calcular porcentagem"
+flat = true
+script = ExtResource( 2 )
+
+[node name="Button Damage" type="Button" parent="Main"]
+margin_left = 50.0
+margin_top = 150.0
+margin_right = 449.0
+margin_bottom = 179.0
+theme = ExtResource( 1 )
+text = "Calcular dano sofrido"
+flat = true
+script = ExtResource( 2 )
+
+[node name="Button Theme" type="Button" parent="Main"]
+margin_left = 50.0
+margin_top = 200.0
+margin_right = 145.0
+margin_bottom = 229.0
+theme = ExtResource( 1 )
+text = "Temas"
+flat = true
+script = ExtResource( 2 )
+
+[node name="Button Exit" type="Button" parent="Main"]
+margin_left = 50.0
+margin_top = 250.0
+margin_right = 126.0
+margin_bottom = 279.0
+theme = ExtResource( 1 )
+text = "Sair"
+flat = true
+script = ExtResource( 2 )
+
+[node name="D20" type="Node2D" parent="."]
+visible = false
+
+[node name="Percent" type="Node2D" parent="."]
+script = SubResource( 1 )
+
+[node name="Attribute" type="Button" parent="Percent"]
+margin_left = 50.0
+margin_top = 25.0
+margin_right = 347.0
+margin_bottom = 60.0
+theme = ExtResource( 1 )
+disabled = true
+text = "Atributo base: "
+flat = true
+
+[node name="Percent" type="Button" parent="Percent"]
+margin_left = 50.0
+margin_top = 75.0
+margin_right = 309.0
+margin_bottom = 110.0
+theme = ExtResource( 1 )
+disabled = true
+shortcut_in_tooltip = false
+text = "Porcentagem: "
+flat = true
+
+[node name="D20" type="Button" parent="Percent"]
+margin_left = 50.0
+margin_top = 175.0
+margin_right = 233.0
+margin_bottom = 210.0
+theme = ExtResource( 1 )
+shortcut_in_tooltip = false
+text = "Somar d20"
+flat = true
+script = ExtResource( 2 )
+
+[node name="Attribute Value" type="LineEdit" parent="Percent"]
+margin_left = 352.0
+margin_top = 25.0
+margin_right = 652.0
+margin_bottom = 60.0
+theme = ExtResource( 1 )
+text = "0"
+context_menu_enabled = false
+virtual_keyboard_enabled = false
+shortcut_keys_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="Percent Value" type="LineEdit" parent="Percent"]
+margin_left = 302.0
+margin_top = 75.0
+margin_right = 602.0
+margin_bottom = 110.0
+theme = ExtResource( 1 )
+text = "0"
+context_menu_enabled = false
+virtual_keyboard_enabled = false
+shortcut_keys_enabled = false
+middle_mouse_paste_enabled = false
+
+[node name="Text Value" type="RichTextLabel" parent="Percent"]
+margin_left = 55.0
+margin_top = 130.0
+margin_right = 605.0
+margin_bottom = 165.0
+focus_mode = 2
+theme = ExtResource( 1 )
+text = "Valor final: 0"
+scroll_active = false
+selection_enabled = true
+
+[node name="Text d20" type="RichTextLabel" parent="Percent"]
+margin_left = 55.0
+margin_top = 230.0
+margin_right = 640.0
+margin_bottom = 265.0
+focus_mode = 2
+theme = ExtResource( 1 )
+text = "Valor do d20: 0"
+scroll_active = false
+selection_enabled = true
+
+[node name="Text d20 Value" type="RichTextLabel" parent="Percent"]
+margin_left = 55.0
+margin_top = 280.0
+margin_right = 640.0
+margin_bottom = 315.0
+focus_mode = 2
+theme = ExtResource( 1 )
+text = "Valor final com d20: 0"
+scroll_active = false
+selection_enabled = true
+
+[node name="Damage" type="Node2D" parent="."]
+visible = false
+
+[node name="Theme" type="Node2D" parent="."]
+visible = false
+
+[connection signal="button_up" from="Main/Button Percent" to="." method="_click_percent"]
+[connection signal="button_up" from="Percent/D20" to="Percent" method="_click"]
